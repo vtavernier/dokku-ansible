@@ -235,7 +235,11 @@ class StorageEntity(Entity):
 
 	def list_raw(self):
 		cmd = self.command_base() + 'list'
-		return self.raw_exec_cmd([cmd, self.params['app']])[1:]
+		try:
+			return self.raw_exec_cmd([cmd, self.params['app']])[1:]
+		except DokkuError as ex:
+			# no storage mounts returns 1
+			return []
 
 
 	def list(self):
