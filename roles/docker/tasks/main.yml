@@ -1,0 +1,31 @@
+---
+# APT packages
+- name: Install docker-ce prereqs
+  apt:
+    update_cache=yes
+    state=latest
+    name={{item}}
+  with_items:
+  - apt-transport-https
+# Docker repository
+- name: Setup docker repository key
+  apt_key:
+    url: https://download.docker.com/linux/{{ distro }}/gpg
+    state: present
+  tags:
+    - docker.apt.key
+- name: Setup docker repository
+  apt_repository:
+    repo: 'deb [arch=amd64] https://download.docker.com/linux/{{ distro }} {{ distro_version }} stable'
+    filename: docker
+    state: present
+  tags:
+    - docker.apt.repository
+# Docker
+- name: Install docker-ce
+  apt:
+    update_cache=yes
+    state=latest
+    name={{item}}
+  with_items:
+  - docker-ce

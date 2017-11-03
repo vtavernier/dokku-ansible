@@ -1,0 +1,59 @@
+---
+- name: Disable dokku web config
+  debconf:
+    name: dokku
+    question: dokku/web_config
+    vtype: boolean
+    value: false
+- name: Enable dokku vhost
+  debconf:
+    name: dokku
+    question: dokku/vhost_enable
+    vtype: boolean
+    value: true
+- name: Set dokku hostname
+  debconf:
+    name: dokku
+    question: dokku/hostname
+    vtype: string
+    value: "{{ hostname }}"
+- name: Skip dokku keyfile
+  debconf:
+    name: dokku
+    question: dokku/skip_key_file
+    vtype: boolean
+    value: true
+- name: Add dokku repository key
+  apt_key:
+    url: https://packagecloud.io/gpg.key
+    state: present
+- name: Add dokku repository
+  apt_repository:
+    repo: "deb https://packagecloud.io/dokku/dokku/ubuntu/ trusty main"
+    filename: dokku
+    state: present
+- name: Install dokku
+  apt:
+    update_cache=yes
+    state=latest
+    name=dokku
+- name: Install dokku dependencies
+  command: 'dokku plugin:install-dependencies --core'
+- name: Install dokku-postgres
+  dokku_plugin:
+    name: postgres
+    repository: https://github.com/dokku/dokku-postgres.git
+    update: false
+- name: Install dokku-letsencrypt
+  dokku_plugin:
+    name: letsencrypt
+    repository: https://github.com/dokku/dokku-letsencrypt.git
+    update: false
+- name: Enable letsencrypt cron-job
+  command: 'dokku letsencrypt:cron-job --add'
+- name: Add deployment key
+  dokku_ssh_keys:
+    name: "{{ dokku_key_name }}"
+    public_key: "{{ lookup('file', dokku_key_path) }}"
+  tags:
+    - dokku.ssh-key
