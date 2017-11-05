@@ -1,0 +1,7 @@
+---
+- hosts: vagrant
+  vars:
+    dokku_key_name: vagrant_key
+    dokku_key_path: '{{ ansible_ssh_private_key_file }}'
+  roles:
+    - dokku
