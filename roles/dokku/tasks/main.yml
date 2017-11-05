@@ -16,7 +16,7 @@
     name: dokku
     question: dokku/hostname
     vtype: string
-    value: "{{ hostname }}"
+    value: "{{ ansible_fqdn }}"
 - name: Skip dokku keyfile
   debconf:
     name: dokku
