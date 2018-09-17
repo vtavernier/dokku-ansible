@@ -40,7 +40,10 @@ def main():
         p = module.params
         meta['changed'] = DomainsEntity().with_params(p).ensure_state(p['state'], p['domain'])
     except DokkuError as err:
-        module.fail_json(msg=err.message, **meta)
+        if err.message != "not deployed\n":
+          module.fail_json(msg=err.message, **meta)
+        else:
+          meta['msg'] = "not deployed, domain change not taken into account"
 
     # return result
     module.exit_json(**meta)
